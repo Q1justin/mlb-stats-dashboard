@@ -1,0 +1,34 @@
+.league-leaders {
+  padding: 16px;
+}
+
+.league-section {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  height: 100%;
+}
+
+.leader-row {
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.leader-row:last-child {
+  border-bottom: none;
+}
+
+.leader-row:hover {
+  background-color: #f8f9fa;
+}
+
+.MuiTypography-subtitle1 {
+  color: #1976d2;
+  font-weight: 600;
+  margin-top: 16px;
+}
+
+.MuiTypography-body2 {
+  color: #2c3e50;
+}
