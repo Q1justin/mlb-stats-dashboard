@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Grid, Typography, CircularProgress } from '@mui/material';
-import { mlbApi } from '../../services/mlbApi';
 import '../../styles/LeagueLeaders.css';
 
 const formatStat = (category, value) => {
