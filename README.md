@@ -1,6 +1,16 @@
-# Getting Started with Create React App
+# MLB Stats Dashboard
+
+A React-based dashboard showing MLB statistics, standings, and live game information.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Features
+
+- Live game scores and updates
+- Division standings
+- League leaders in batting and pitching
+- Dark mode support
+- Responsive design
 
 ## Available Scripts
 
@@ -68,3 +78,4 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
