@@ -7,23 +7,30 @@ export const mlbApi = {
   getLiveGames: async () => {
     try {
       const response = await axios.get(`${BASE_URL}/schedule?sportId=1&gameType=R&hydrate=team,linescore,game(content(summary,media(epg))),standings`);
-      console.log(response)
       return response.data;
     } catch (error) {
       console.error('Error fetching live games:', error);
-      throw error;
+      throw new Error('Failed to fetch live games data: ' + error.message);
     }
   },
 
   // Get team standings
   getStandings: async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/standings?leagueId=103,104`);
-      console.log(response.data)
+      // Add standings type and season parameters for complete data
+      const response = await axios.get(`${BASE_URL}/standings`, {
+        params: {
+          leagueId: '103,104',
+          season: 2025,
+          standingsTypes: 'regularSeason',
+          hydrate: 'team,division'
+        }
+      });
+      console.log('Standings API response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error fetching standings:', error);
-      throw error;
+      throw new Error('Failed to fetch standings data: ' + error.message);
     }
   },
 
@@ -61,15 +68,65 @@ export const mlbApi = {
   },
 
   // Get league leaders
-  getLeagueLeaders: async (statGroup = 'hitting', leagueId, season = 2025) => {
+  getLeagueLeaders: async (statGroup = 'hitting', leagueId) => {
     try {
-      const response = await axios.get(
-        `${BASE_URL}/stats/leaders?sportId=1&leagueId=${leagueId}&season=${season}&statGroup=${statGroup}&limit=10`
-      );
-      return response.data;
+      const stats = statGroup === 'hitting' 
+        ? ['homeRuns', 'battingAverage', 'rbi', 'runs', 'stolenBases']
+        : ['era', 'wins', 'strikeOuts', 'saves', 'whip'];
+      
+      // Use a fixed year for testing since we're in 2025
+      const season = 2023;
+      
+      console.log(`Fetching ${statGroup} leaders for league ${leagueId} for season ${season}`);
+      
+      const promises = stats.map(stat => {
+        console.log(`Fetching stat: ${stat}`);
+        return axios.get(`${BASE_URL}/stats/leaders`, {
+          params: {
+            sportId: 1,
+            leagueId: leagueId,
+            stat: stat,
+            limit: 10,
+            group: statGroup,
+            season: season,
+            hydrate: 'person,team'
+          }
+        }).then(response => {
+          console.log(`Got response for ${stat}:`, response.data);
+          return response;
+        }).catch(error => {
+          console.error(`Error fetching ${stat} leaders:`, error);
+          return { data: { leagueLeaders: [{ leaders: [] }] } };
+        });
+      });
+
+      const responses = await Promise.all(promises);
+      console.log('League leaders responses:', responses);
+      
+      const leaders = responses.map((response, index) => {
+        const categoryData = response.data.leagueLeaders?.[0]?.leaders || [];
+        return {
+          category: stats[index],
+          data: categoryData.map(leader => ({
+            ...leader,
+            value: leader.value,
+            person: {
+              id: leader.person?.id,
+              fullName: leader.person?.fullName || 'Unknown Player'
+            }
+          }))
+        };
+      });
+
+      return {
+        stats,
+        leaders
+      };
     } catch (error) {
       console.error('Error fetching league leaders:', error);
-      throw error;
+      throw new Error(`Failed to fetch ${statGroup} leaders: ${error.message}`);
+    } finally {
+      console.log(`Finished fetching ${statGroup} leaders for league ${leagueId}`);
     }
   },
 

@@ -10,9 +10,10 @@ import {
   Tabs,
   Tab,
   Skeleton,
+  Typography,
 } from '@mui/material';
 
-function Standings({ data, loading }) {
+function Standings({ data = [], loading }) {
   const [selectedDivision, setSelectedDivision] = useState(0);
 
   if (loading) {
@@ -21,12 +22,25 @@ function Standings({ data, loading }) {
     );
   }
 
+  if (!Array.isArray(data) || data.length === 0) {
+    console.log('Standings data is empty or invalid:', data);
+    return (
+      <Typography color="textSecondary" align="center" sx={{ p: 3 }}>
+        No standings data available
+      </Typography>
+    );
+  }
+
+  console.log('Current standings data:', data);
+
   const handleTabChange = (event, newValue) => {
     setSelectedDivision(newValue);
   };
 
+  const divisions = data.filter(record => record.division && record.division.name);
+  
   const getCurrentDivision = () => {
-    return data[selectedDivision] || { teamRecords: [] };
+    return divisions[selectedDivision] || { teamRecords: [] };
   };
 
   return (
@@ -37,8 +51,12 @@ function Standings({ data, loading }) {
         variant="scrollable"
         scrollButtons="auto"
       >
-        {data.map((division, index) => (
-          <Tab key={index} label={division.division.name} />
+        {divisions.map((record, index) => (
+          <Tab 
+            key={record.division.id} 
+            label={record.division.name}
+            sx={{ minWidth: 120 }}
+          />
         ))}
       </Tabs>
       
